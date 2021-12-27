@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  python3.8
+  Selenium on Lambda
+Globals:
+  Function:
+    Timeout: 120
+
+Resources:
+  SeleniumFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Architectures:
+        - x86_64
+      Events:
+        Selenium:
+          Type: Api 
+          Properties:
+            Path: /selenium
+            Method: get
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./src
+      DockerTag: python3.9-Selenium
+
+Outputs:
+  SeleniumApi:
+    Description: "API Gateway endpoint URL for Prod stage for Selenium function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/selenium/"
+  SeleniumFunction:
+    Description: "Selenium Lambda Function ARN"
+    Value: !GetAtt SeleniumFunction.Arn
+  SeleniumFunctionIamRole:
+    Description: "Implicit IAM Role created for Selenium function"
+    Value: !GetAtt SeleniumFunction.Arn

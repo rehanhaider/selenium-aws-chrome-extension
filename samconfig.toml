@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "selaws"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-10ou7y86c11sr"
+s3_prefix = "selaws"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = ["SeleniumFunction=268674271179.dkr.ecr.us-east-1.amazonaws.com/selaws7db22412/seleniumfunction930ef00frepo"]
