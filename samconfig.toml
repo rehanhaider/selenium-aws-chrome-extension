@@ -8,3 +8,5 @@ s3_prefix = "selaws"
 region = "us-east-1"
 capabilities = "CAPABILITY_IAM"
 image_repositories = ["SeleniumFunction=268674271179.dkr.ecr.us-east-1.amazonaws.com/selaws7db22412/seleniumfunction930ef00frepo"]
+
+
