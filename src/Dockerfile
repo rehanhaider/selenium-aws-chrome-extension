@@ -29,7 +29,8 @@ ARG FUNCTION_DIR
 WORKDIR ${FUNCTION_DIR}
 
 # Copy setup & other temporary files
-COPY *.sh requirements.txt GoFullPage.crx /tmp/
+COPY *.sh requirements.txt /tmp/
+COPY GoFullPage.crx /opt/
 RUN pip install --upgrade pip -q
 RUN pip install -r /tmp/requirements.txt -q
 RUN /bin/bash /tmp/install_chrome.sh
