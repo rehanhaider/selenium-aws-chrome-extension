@@ -38,6 +38,8 @@ RUN /bin/bash /tmp/install_driver.sh
 COPY install_chromium.sh /tmp/
 RUN /bin/bash /tmp/install_chromium.sh
 COPY app.py ${FUNCTION_DIR}
+
+COPY GoFullPage.crx /opt/
 RUN ls -al /opt/chrome/stable/
 
 ENTRYPOINT [ "python3", "-m", "awslambdaric" ]
