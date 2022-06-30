@@ -1,47 +1,34 @@
-# Define function directory
-ARG FUNCTION_DIR="/function"
-ARG RUNTIME_VERSION="3.9"
+FROM public.ecr.aws/lambda/python:3.9 as stage
+
+# Hack to install chromium dependencies
+RUN yum install -y -q sudo unzip
+
+# Find the version of latest stable build of chromium from below
+# https://omahaproxy.appspot.com/
+# Then follow the instructions here in below URL to download old builds of Chrome/Chromium that are stable
+# Current stable version of Chromium
+ENV CHROMIUM_VERSION=1002910 
 
 
-FROM ubuntu:latest as base-image
+# Install Chromium
+COPY install-browser.sh /tmp/
+RUN /usr/bin/bash /tmp/install-browser.sh
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC
-RUN apt-get install -y g++ make cmake unzip libcurl4-openssl-dev
-RUN apt-get install -y python3 python3-pip 
-RUN apt-get install xvfb python3-tk python3-dev -y
-RUN apt-get install curl wget -y
+FROM public.ecr.aws/lambda/python:3.9 as base
 
-ARG FUNCTION_DIR
-# Create function directory
-RUN mkdir -p ${FUNCTION_DIR}
-# Copy function code
+COPY chrome-deps.txt /tmp/
+RUN yum install -y $(cat /tmp/chrome-deps.txt)
+RUN yum install xorg-x11-server-Xvfb.x86_64 -y
 
-
-RUN pip install \
-    --target ${FUNCTION_DIR} \
-    awslambdaric
-
-# Include global arg in this stage of the build
-ARG FUNCTION_DIR
-# Set working directory to function root directory
-WORKDIR ${FUNCTION_DIR}
-
-# Copy setup & other temporary files
+# Install Python dependencies for function
 COPY requirements.txt /tmp/
-#COPY GoFullPage.crx /opt/
-RUN pip install --upgrade pip -q
-RUN pip install -r /tmp/requirements.txt -q
-COPY install_chrome.sh /tmp/
-RUN /bin/bash /tmp/install_chrome.sh
-COPY install_driver.sh /tmp/
-RUN /bin/bash /tmp/install_driver.sh
-COPY install_chromium.sh /tmp/
-RUN /bin/bash /tmp/install_chromium.sh
-COPY app.py ${FUNCTION_DIR}
+RUN python3 -m pip install --upgrade pip -q
+RUN python3 -m pip install -r /tmp/requirements.txt -q 
 
 COPY GoFullPage.crx /opt/
-RUN ls -al /opt/chrome/stable/
 
-ENTRYPOINT [ "python3", "-m", "awslambdaric" ]
+COPY --from=stage /opt/chrome /opt/chrome
+COPY --from=stage /opt/chromedriver /opt/chromedriver
+COPY app.py ${LAMBDA_TASK_ROOT}
+
 CMD [ "app.handler" ]
-

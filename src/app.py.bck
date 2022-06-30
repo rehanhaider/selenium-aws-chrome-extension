@@ -1,3 +1,4 @@
+# src/app.py
 import time
 import glob
 import os
@@ -17,12 +18,11 @@ def handler(event=None, context=None):
     print('Started Display')
     #Pyautogui requires os.environ["Display"] variable to be set. 
     import pyautogui
-    print("AutoGUI Loaded...")
 
     chrome_options = Options()
-    
     # Headless environment starts without browser UI so no extensions
     #chrome_options.add_argument("--headless") 
+    chrome_options.binary_location = "/opt/chrome/stable/chrome"
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
@@ -37,8 +37,6 @@ def handler(event=None, context=None):
     chrome_options.add_experimental_option("prefs", download_directory)
     webdriver_service = Service("/opt/chromedriver/stable/chromedriver")
     browser = webdriver.Chrome(service=webdriver_service, options=chrome_options)
-    print("Chrome Options Loaded...")
-
 
     browser.get("https://example.com")
     # Open Extension options
@@ -79,7 +77,7 @@ def handler(event=None, context=None):
     # importing earlier conflicts with selenium actions
     import boto3
     s3 = boto3.client("s3")
-    BUCKET_NAME = "cloudbytes.dev"
+    BUCKET_NAME = "cloudbytes.dev" # replace with your bucket name
 
     for image in glob.iglob("/tmp/*.png"): 
         s3.upload_file(image, BUCKET_NAME, os.path.basename(image))

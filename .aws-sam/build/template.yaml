@@ -1,11 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: 'python3.8 Selenium on Lambda
+Description: 'python3.9
+
+  Sample SAM Template for selenium
 
   '
 Globals:
   Function:
     Timeout: 120
+    MemorySize: 2048
 Resources:
   SeleniumFunction:
     Type: AWS::Serverless::Function
@@ -19,14 +22,15 @@ Resources:
           Properties:
             Path: /selenium
             Method: get
-      ImageUri: seleniumfunction:python3.9-Selenium
+      ImageUri: seleniumfunction:python3.9-v1
     Metadata:
+      DockerContext: /workspaces/selenium-aws-chrome-extension/src
+      DockerTag: python3.9-v1
       Dockerfile: Dockerfile
-      DockerContext: ./src
-      DockerTag: python3.9-Selenium
+      SamResourceId: SeleniumFunction
 Outputs:
   SeleniumApi:
-    Description: API Gateway endpoint URL for Prod stage for Selenium function
+    Description: API Gateway endpoint URL for Prod stage for Seleniumc function
     Value:
       Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/selenium/
   SeleniumFunction:
@@ -39,5 +43,5 @@ Outputs:
     Description: Implicit IAM Role created for Selenium function
     Value:
       Fn::GetAtt:
-      - SeleniumFunction
+      - SeleniumFunctionRole
       - Arn
