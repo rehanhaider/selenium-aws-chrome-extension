@@ -1,9 +1,8 @@
-awslambdaric
 selenium
-pyvirtualdisplay
 pillow
 keyboard
 pyautogui
 python-xlib
 boto3
-xvfbwrapper
+awslambdaric
+pyvirtualdisplay

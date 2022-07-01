@@ -6,15 +6,18 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-#from xvfbwrapper import Xvfb
+#from pyvirtualdisplay import Display
+
 
 def handler(event=None, context=None):
-    #vdisplay = Xvfb()
-    #vdisplay.start()
+    #display = Display(visible=False, extra_args=[':25'], size=(2560, 1440), backend="xvfb") 
+    #display.start()
+    print('Started Display')
 
+    #import pyautogui
     chrome_options = Options()
     chrome_options.binary_location = "/opt/chrome/chrome"
-    chrome_options.add_argument("--headless")
+    #chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
@@ -29,24 +32,47 @@ def handler(event=None, context=None):
     chrome_options.add_extension("/opt/GoFullPage.crx")
     download_directory = {"download.default_directory": "/tmp/"}
     chrome_options.add_experimental_option("prefs", download_directory)
-    webdriver_service = Service("/opt/chromedriver")
-    chrome = webdriver.Chrome(service=webdriver_service, options=chrome_options)
+    browser = webdriver.Chrome("/opt/chromedriver", options=chrome_options)
     
-    #chrome.switch_to.window(chrome.window_handles[1])
-    #chrome.get("chrome-extension://fdpohaocaechififmbbbbbknoalclacl/options.html")
+    # Open Extension options
+    print("Open Extension options...")
+    browser.switch_to.window(browser.window_handles[1])
+    browser.get("chrome-extension://fdpohaocaechififmbbbbbknoalclacl/options.html")
 
-    chrome.get("https://cloudbytes.dev/")
-    description = chrome.find_element(By.NAME, "description").get_attribute("content")
-    print(description)
+    # Provide Download Permission
+    print("Provide Download Permission...")
+    browser.find_element(By.ID, "perm-toggle").click()
+    browser.find_element(By.NAME, "downloads").click()
+    browser.switch_to.active_element
+    time.sleep(1)
+    #pyautogui.press("tab")
+    time.sleep(1)
+    #pyautogui.press("enter")
 
-    #vdisplay.stop()
-    chrome.close()
+    # Close options
+    print("Close options...")
+    print(len(browser.window_handles)) #Expected 2
+    browser.close()
+    print(len(browser.window_handles)) #Expected 1
+    time.sleep(1)
+    # Take screenshot
+    print("Take screenshot...")
+    browser.switch_to.window(browser.window_handles[0])
+    #pyautogui.hotkey("shift", "alt", "p")
+    time.sleep(5)
+    print(len(browser.window_handles)) #Expected 2
+    #browser.switch_to.window(browser.window_handles[1])
+    #time.sleep(1)
+    #browser.find_element(By.ID, "btn-download").click()
+
+    time.sleep(5)
+    browser.quit()
 
     return {
         "statusCode": 200,
         "body": json.dumps(
             {
-                "message": description,
+                "message": "success",
             }
         ),
     }
